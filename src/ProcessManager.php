@@ -9,7 +9,6 @@
 namespace rabbit\process;
 
 use rabbit\core\Exception;
-use rabbit\core\ObjectFactory;
 use Swoole\Process as SwooleProcess;
 
 /**
