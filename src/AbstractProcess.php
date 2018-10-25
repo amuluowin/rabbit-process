@@ -8,28 +8,43 @@
 
 namespace rabbit\process;
 
+use rabbit\contract\Arrayable;
+
 /**
  * Class AbstractProcess
  * @package rabbit\process
  */
-class AbstractProcess implements ProcessInterface
+abstract class AbstractProcess implements ProcessInterface, Arrayable
 {
     /**
      * @var bool
      */
-    private $boot = false;
+    protected $boot = false;
     /**
      * @var bool
      */
-    private $co = false;
+    protected $co = true;
     /**
      * @var bool
      */
-    private $inout = false;
+    protected $inout = false;
     /**
      * @var int
      */
-    private $pipe = 2;
+    protected $pipe = 0;
+
+    /**
+     * @var int
+     */
+    protected $status = self::STATUS_STOP;
+
+    /**
+     * @param string $status
+     */
+    public function setStatus(string $status): void
+    {
+        $this->status = $status;
+    }
 
     /**
      * @return bool
@@ -74,8 +89,13 @@ class AbstractProcess implements ProcessInterface
     /**
      * @return bool
      */
-    public function wait(): bool
+    public function wait(bool $blocking = true): bool
     {
-        return true;
+        return $blocking;
+    }
+
+    public function toArray(): array
+    {
+        return \get_object_vars($this);
     }
 }

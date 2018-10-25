@@ -14,10 +14,14 @@ namespace rabbit\process;
  */
 interface ProcessInterface
 {
+    const STATUS_STOP = 'stop';
+    const STATUS_WORKING = 'working';
+    const STATUS_FINISH = 'finish';
+
     /**
      * @param Process $process
      */
-    public function run(Process $process):void;
+    public function run(Process $process): void;
 
     /**
      * @return bool
@@ -27,5 +31,5 @@ interface ProcessInterface
     /**
      * @return bool
      */
-    public function wait():bool;
+    public function wait(bool $blocking = true): bool;
 }

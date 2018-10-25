@@ -8,6 +8,7 @@
 
 namespace rabbit\process;
 
+use rabbit\core\ObjectFactory;
 use Swoole\Process as SwooleProcess;
 
 /**
@@ -28,6 +29,11 @@ class Process
     public function __construct(SwooleProcess $process)
     {
         $this->process = $process;
+    }
+
+    public function name(string $name): void
+    {
+        $this->process->name(ObjectFactory::get('appName', false, 'rabbit') . ': ' . $name);
     }
 
     /**

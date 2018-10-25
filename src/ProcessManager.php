@@ -21,33 +21,58 @@ class ProcessManager
     /**
      * @var array
      */
-    private static $processes = [];
+    private $processes = [];
+
+    /**
+     * @var array
+     */
+    private $definition = [];
+
+    public function getAll(bool $definition = true): array
+    {
+        return $definition ? $this->definition : $this->processes;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function autoStart(\Swoole\Server $server = null): void
+    {
+        foreach ($this->definition as $name => $process) {
+            /** @var AbstractProcess $process */
+            if ($process->getBoot()) {
+                $swooleProcess = $this->create($name, $process);
+                $process->setStatus(ProcessInterface::STATUS_WORKING);
+                $server && $server->addProcess($swooleProcess->getProcess());
+            }
+        }
+    }
 
     /**
      * @param string $name
      *
      * @return Process
      */
-    public static function create(string $name): Process
+    public function create(string $name, AbstractProcess $processObj = null): Process
     {
-        if (isset(self::$processes[$name])) {
-            return self::$processes[$name];
+        if (isset($this->processes[$name])) {
+            return $this->processes[$name];
         }
 
         /** @var AbstractProcess $processObj */
-        $processObj = self::getProcessMaping($name);
+        $processObj = $processObj ?? $this->getProcessMaping($name);
         $swooleProcess = new SwooleProcess(function (SwooleProcess $swooleProcess) use ($name, $processObj) {
             $process = new Process($swooleProcess);
-            if ($co) {
+            if ($processObj->getCo()) {
                 go(function () use ($name, $processObj, $process) {
-                    self::runProcess($name, $processObj, $process);
+                    $this->runProcess($name, $processObj, $process);
                 });
                 return;
             }
-            self::runProcess($name, $processObj, $process);
+            $this->runProcess($name, $processObj, $process);
         }, $processObj->getInout(), $processObj->getPipe());
         $process = new Process($swooleProcess);
-        self::$processes[$name] = $process;
+        $this->processes[$name] = $process;
 
         return $process;
     }
@@ -58,13 +83,13 @@ class ProcessManager
      * @return Process
      * @throws ProcessException
      */
-    public static function get(string $name): Process
+    public function get(string $name): Process
     {
-        if (!isset(self::$processes[$name])) {
-            throw new ProcessException(sprintf('The %s process is not create, you must to create by first !', $name));
+        if (!isset($this->processes[$name])) {
+            throw new Exception(sprintf('The %s process is not create, you must to create by first !', $name));
         }
 
-        return self::$processes[$name];
+        return $this->processes[$name];
     }
 
     /**
@@ -72,60 +97,60 @@ class ProcessManager
      * @return AbstractProcess
      * @throws Exception
      */
-    private static function getProcessMaping(string $name): AbstractProcess
+    private function getProcessMaping(string $name): AbstractProcess
     {
-        $collector = ObjectFactory::get('process');
-        if (!isset($collector[$name])) {
+        if (!isset($this->definition[$name])) {
             throw new Exception(sprintf('The %s process is not exist! ', $name));
         }
 
-        $process = $collector[$name];
+        $process = $this->definition[$name];
 
         return $process;
     }
 
     /**
      * @param string $name
+     * @param AbstractProcess $processObj
      * @param Process $process
-     * @param bool $boot
-     * @throws \Exception
      */
-    private static function runProcess(string $name, AbstractProcess $processObj, Process $process): void
+    private function runProcess(string $name, AbstractProcess $processObj, Process $process): void
     {
-        self::beforeProcess($name, $processObj);
-        if ($processObject->check()) {
+        $this->beforeProcess($name, $processObj, $process);
+
+        if ($processObj->check()) {
             call_user_func_array([$processObj, 'run'], [$process]);
         }
     }
 
     /**
-     * After process
-     *
      * @param string $processName
-     * @param bool $boot
+     * @param AbstractProcess $processObj
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      */
-    private static function beforeProcess(string $processName, AbstractProcess $processObj): void
+    private function beforeProcess(string $processName, AbstractProcess $processObj, Process $process): void
     {
-        if ($processObj->getBoot()) {
-            ObjectFactory::reload();
-        }
-
-        self::waitChildProcess($processName, $processObj);
+//        if ($processObj->getBoot()) {
+//            ObjectFactory::reload();
+//        }
+        $process->name($processName);
+        $this->waitChildProcess($processName, $processObj);
     }
 
     /**
-     * Wait child process
+     * @param string $name
+     * @param AbstractProcess $processObj
      */
-    private static function waitChildProcess(string $name, AbstractProcess $processObj): void
+    private function waitChildProcess(string $name, AbstractProcess $processObj): void
     {
-        if (($hasWait = method_exists($processObj, 'wait')) || $processObj->getBoot()) {
+        if (($hasWait = $processObj->wait()) || $processObj->getBoot()) {
             Process::signal(SIGCHLD, function ($sig) use ($name, $processObj, $hasWait) {
                 while ($ret = Process::wait(false)) {
                     if ($hasWait) {
                         $processObj->wait($ret);
                     }
-
-                    unset(self::$processes[$name]);
+                    $processObj->setStatus(ProcessInterface::STATUS_FINISH);
+                    unset($this->processes[$name]);
                 }
             });
         }
