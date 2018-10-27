@@ -8,8 +8,6 @@
 
 namespace rabbit\process;
 
-use rabbit\App;
-
 /**
  * Class AbstractProcessPool
  * @package rabbit\process
