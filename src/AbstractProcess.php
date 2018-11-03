@@ -9,6 +9,7 @@
 namespace rabbit\process;
 
 use rabbit\contract\Arrayable;
+use rabbit\server\WorkerHandlerInterface;
 
 /**
  * Class AbstractProcess
@@ -37,6 +38,32 @@ abstract class AbstractProcess implements ProcessInterface, Arrayable
      * @var int
      */
     protected $status = self::STATUS_STOP;
+
+    /**
+     * @var array | WorkerHandlerInterface[]
+     */
+    private $handlers = [];
+
+    /**
+     * AbstractProcess constructor.
+     * @param array $handlers
+     */
+    public function __construct(array $handlers = [])
+    {
+        $this->handlers = $handlers;
+    }
+
+    /**
+     *
+     */
+    public function processStart(Process $process): void
+    {
+        foreach ($this->handlers as $handler) {
+            if ($handler instanceof WorkerHandlerInterface) {
+                $handler->handle($process->getProcess()->pipe);
+            }
+        }
+    }
 
     /**
      * @param string $status

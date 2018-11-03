@@ -117,6 +117,7 @@ class ProcessManager
         $this->beforeProcess($name, $processObj, $process);
 
         if ($processObj->check()) {
+            call_user_func_array([$processObj, 'processStart'], [$process]);
             call_user_func_array([$processObj, 'run'], [$process]);
         }
     }
