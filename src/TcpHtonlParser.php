@@ -11,7 +11,7 @@ namespace rabbit\process;
 
 use rabbit\helper\JsonHelper;
 use rabbit\parser\ParserInterface;
-use rabbit\socket\TcpParserInterface;
+use rabbit\socket\tcp\TcpParserInterface;
 
 /**
  * Class TcpHtonlParser
