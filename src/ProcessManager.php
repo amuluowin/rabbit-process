@@ -8,7 +8,10 @@
 
 namespace rabbit\process;
 
+use rabbit\App;
 use rabbit\core\Exception;
+use rabbit\helper\ExceptionHelper;
+use rabbit\helper\JsonHelper;
 use Swoole\Process as SwooleProcess;
 
 /**
@@ -117,8 +120,13 @@ class ProcessManager
         $this->beforeProcess($name, $processObj, $process);
 
         if ($processObj->check()) {
-            call_user_func_array([$processObj, 'processStart'], [$process]);
-            call_user_func_array([$processObj, 'run'], [$process]);
+            try {
+                call_user_func_array([$processObj, 'processStart'], [$process]);
+                call_user_func_array([$processObj, 'run'], [$process]);
+            } catch (\Throwable $exception) {
+                $message = ExceptionHelper::convertExceptionToArray($exception);
+                App::error(JsonHelper::encode($message));
+            }
         }
     }
 
