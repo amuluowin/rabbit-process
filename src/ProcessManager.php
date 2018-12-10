@@ -9,7 +9,9 @@
 namespace rabbit\process;
 
 use rabbit\App;
+use rabbit\core\Context;
 use rabbit\core\Exception;
+use rabbit\helper\CoroHelper;
 use rabbit\helper\ExceptionHelper;
 use rabbit\helper\JsonHelper;
 use Swoole\Process as SwooleProcess;
@@ -30,6 +32,10 @@ class ProcessManager
      */
     private $definition = [];
 
+    /**
+     * @param bool $definition
+     * @return array
+     */
     public function getAll(bool $definition = true): array
     {
         return $definition ? $this->definition : $this->processes;
@@ -67,6 +73,9 @@ class ProcessManager
             $process = new Process($swooleProcess);
             if ($processObj->getCo()) {
                 go(function () use ($name, $processObj, $process) {
+                    CoroHelper::addDefer(function () {
+                        Context::release();
+                    });
                     $this->runProcess($name, $processObj, $process);
                 });
                 return;
