@@ -21,6 +21,8 @@ class Process
      * @var SwooleProcess
      */
     private $process;
+    /** @var string */
+    private $name;
 
     /**
      * Process constructor.
@@ -33,7 +35,16 @@ class Process
 
     public function name(string $name): void
     {
+        $this->name = $name;
         $this->process->name(ObjectFactory::get('appName', false, 'rabbit') . ': ' . $name);
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**
