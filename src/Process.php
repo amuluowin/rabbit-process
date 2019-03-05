@@ -33,20 +33,6 @@ class Process
         $this->process = $process;
     }
 
-    public function name(string $name): void
-    {
-        $this->name = $name;
-        $this->process->name(ObjectFactory::get('appName', false, 'rabbit') . ': ' . $name);
-    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
     /**
      * @param int $pid
      * @param int $signo
@@ -102,6 +88,20 @@ class Process
     public static function setaffinity(array $cpuSet): bool
     {
         return SwooleProcess::setaffinity($cpuSet);
+    }
+
+    public function name(string $name): void
+    {
+        $this->name = $name;
+        $this->process->name(ObjectFactory::get('appName', false, 'rabbit') . ': ' . $name);
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**

@@ -56,21 +56,6 @@ class ProcessPoolManager
 
     /**
      * @param string $name
-     *
-     * @return Process
-     * @throws ProcessException
-     */
-    public function get(string $name): Process
-    {
-        if (!isset($this->processes[$name])) {
-            throw new Exception(sprintf('The %s process is not create, you must to create by first !', $name));
-        }
-
-        return $this->processes[$name];
-    }
-
-    /**
-     * @param string $name
      * @return AbstractProcess
      * @throws Exception
      */
@@ -83,5 +68,20 @@ class ProcessPoolManager
         $process = $this->definition[$name];
 
         return $process;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Process
+     * @throws ProcessException
+     */
+    public function get(string $name): Process
+    {
+        if (!isset($this->processes[$name])) {
+            throw new Exception(sprintf('The %s process is not create, you must to create by first !', $name));
+        }
+
+        return $this->processes[$name];
     }
 }
