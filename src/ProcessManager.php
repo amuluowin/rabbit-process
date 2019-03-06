@@ -71,17 +71,8 @@ class ProcessManager
         $processObj = $processObj ?? $this->getProcessMaping($name);
         $swooleProcess = new SwooleProcess(function (SwooleProcess $swooleProcess) use ($name, $processObj) {
             $process = new Process($swooleProcess);
-            if ($processObj->getCo()) {
-                go(function () use ($name, $processObj, $process) {
-                    CoroHelper::addDefer(function () {
-                        Context::release();
-                    });
-                    $this->runProcess($name, $processObj, $process);
-                });
-                return;
-            }
             $this->runProcess($name, $processObj, $process);
-        }, $processObj->getInout(), $processObj->getPipe());
+        }, $processObj->getInout(), $processObj->getPipe(), $processObj->getCo());
         $process = new Process($swooleProcess);
         $this->processes[$name] = $process;
 
