@@ -33,6 +33,8 @@ abstract class AbstractProcess implements ProcessInterface, Arrayable
      * @var int
      */
     protected $pipe = 0;
+    /** @var int */
+    protected $poolSize = 0;
 
     /**
      * @var int
@@ -103,6 +105,14 @@ abstract class AbstractProcess implements ProcessInterface, Arrayable
     public function getPipe(): int
     {
         return $this->pipe;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPoolsize(): int
+    {
+        return $this->poolSize;
     }
 
     /**

@@ -9,9 +9,7 @@
 namespace rabbit\process;
 
 use rabbit\App;
-use rabbit\core\Context;
 use rabbit\core\Exception;
-use rabbit\helper\CoroHelper;
 use rabbit\helper\ExceptionHelper;
 use rabbit\helper\JsonHelper;
 use Swoole\Process as SwooleProcess;
@@ -26,6 +24,10 @@ class ProcessManager
      * @var array
      */
     private $processes = [];
+    /**
+     * @var array
+     */
+    private $processPool = [];
 
     /**
      * @var array
@@ -49,33 +51,37 @@ class ProcessManager
         foreach ($this->definition as $name => $process) {
             /** @var AbstractProcess $process */
             if ($process->getBoot()) {
-                $swooleProcess = $this->create($name, $process);
-                $process->setStatus(ProcessInterface::STATUS_WORKING);
-                $server && $server->addProcess($swooleProcess->getProcess());
+                /** @var AbstractProcess $processObj */
+                $processObj = $this->getProcessMaping($name);
+                if ($processObj->getPoolsize() > 0) {
+                    for ($i = 0; $i < $processObj->getPoolsize(); $i++) {
+                        $swooleProcess = $this->buildProcess($name, $processObj, $i);
+                        $this->processPool[$name][] = $swooleProcess;
+                        $process->setStatus(ProcessInterface::STATUS_WORKING);
+                        $server && $server->addProcess($swooleProcess->getProcess());
+                    }
+                } else {
+                    $swooleProcess = $this->buildProcess($name, $processObj);
+                    $this->processes[$name] = $swooleProcess;
+                    $process->setStatus(ProcessInterface::STATUS_WORKING);
+                    $server && $server->addProcess($swooleProcess->getProcess());
+                }
             }
         }
     }
 
     /**
      * @param string $name
-     *
+     * @param AbstractProcess $processObj
      * @return Process
      */
-    public function create(string $name, AbstractProcess $processObj = null): Process
+    private function buildProcess(string $name, AbstractProcess $processObj, int $index = null): Process
     {
-        if (isset($this->processes[$name])) {
-            return $this->processes[$name];
-        }
-
-        /** @var AbstractProcess $processObj */
-        $processObj = $processObj ?? $this->getProcessMaping($name);
-        $swooleProcess = new SwooleProcess(function (SwooleProcess $swooleProcess) use ($name, $processObj) {
+        $swooleProcess = new SwooleProcess(function (SwooleProcess $swooleProcess) use ($name, $index, $processObj) {
             $process = new Process($swooleProcess);
-            $this->runProcess($name, $processObj, $process);
+            $this->runProcess($index !== null ? $name . '-' . $index : $name, $processObj, $process);
         }, $processObj->getInout(), $processObj->getPipe(), $processObj->getCo());
         $process = new Process($swooleProcess);
-        $this->processes[$name] = $process;
-
         return $process;
     }
 
@@ -151,6 +157,19 @@ class ProcessManager
 
     /**
      * @param string $name
+     * @return Process[]
+     */
+    public function getPool(string $name): array
+    {
+        if (!isset($this->processPool[$name])) {
+            throw new Exception(sprintf('The %s process is not create, you must to create it first !', $name));
+        }
+
+        return $this->processPool[$name];
+    }
+
+    /**
+     * @param string $name
      *
      * @return Process
      * @throws ProcessException
@@ -158,7 +177,7 @@ class ProcessManager
     public function get(string $name): Process
     {
         if (!isset($this->processes[$name])) {
-            throw new Exception(sprintf('The %s process is not create, you must to create by first !', $name));
+            throw new Exception(sprintf('The %s process is not create, you must to create it first !', $name));
         }
 
         return $this->processes[$name];
