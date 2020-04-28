@@ -92,7 +92,7 @@ abstract class AbstractProcessPool implements ProcessPoolInterface
         });
         switch ($this->ipcType) {
             case self::SWOOLE_IPC_DEFAULT:
-                go(function () use ($pool, $workerId) {
+                rgo(function () use ($pool, $workerId) {
                     while ($this->running) {
                         $this->run($pool, $workerId);
                     }
@@ -100,19 +100,10 @@ abstract class AbstractProcessPool implements ProcessPoolInterface
                 break;
             case self::SWOOLE_IPC_SOCKET:
             case self::SWOOLE_IPC_MSGQUEUE:
-                go(function () use ($pool, $workerId) {
+                rgo(function () use ($pool, $workerId) {
                     $this->run($pool, $workerId);
                 });
                 break;
         }
-    }
-
-    /**
-     * @param \Swoole\Process\Pool $pool
-     * @param string $data
-     */
-    public function message(\Swoole\Process\Pool $pool, string $data)
-    {
-        // TODO: Implement message() method.
     }
 }
