@@ -26,7 +26,7 @@ class BootProcess implements BootInterface
     {
         /** @var ProcessManager $processManager */
         $processManager = ObjectFactory::get('process');
-        $processManager->autoStart(App::getServer());
+        $processManager->autoStart(App::getServer()->getSwooleServer());
     }
 
 }
