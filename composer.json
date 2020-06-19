@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "rabbit/framework": "dev-master"
+    "rabbit/framework": "^1.0"
   },
   "autoload": {
     "psr-4": {
