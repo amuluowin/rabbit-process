@@ -1,37 +1,32 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2018/10/25
- * Time: 19:27
- */
+declare(strict_types=1);
 
-namespace rabbit\process;
+namespace Rabbit\Process;
 
 /**
  * Class AbstractProcessPool
- * @package rabbit\process
+ * @package Rabbit\Process
  */
 abstract class AbstractProcessPool implements ProcessPoolInterface
 {
     /** @var int */
-    protected $workerNum = 1;
+    protected int $workerNum = 1;
     /**
      * @var int
      */
-    protected $ipcType = 0;
+    protected int $ipcType = 0;
     /**
      * @var int
      */
-    protected $msgqueueKey = 0;
+    protected int $msgqueueKey = 0;
     /**
      * @var array
      */
-    protected $listen = ['0..0.0.0', 9504, 2048];
+    protected array $listen = ['0..0.0.0', 9504, 2048];
     /**
      * @var bool
      */
-    protected $running = true;
+    protected bool $running = true;
 
     /**
      * @return int

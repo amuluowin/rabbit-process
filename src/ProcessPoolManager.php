@@ -6,7 +6,7 @@
  * Time: 19:19
  */
 
-namespace rabbit\process;
+namespace Rabbit\Process;
 
 use rabbit\core\Exception;
 

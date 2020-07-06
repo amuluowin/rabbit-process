@@ -10,11 +10,11 @@
     }
   ],
   "require": {
-    "rabbit/framework": "^1.0"
+    "rabbit/base": "dev-master"
   },
   "autoload": {
     "psr-4": {
-      "rabbit\\process\\": "src/"
+      "Rabbit\\Process\\": "src/"
     }
   }
 }

@@ -1,16 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2018/10/25
- * Time: 9:25
- */
+declare(strict_types=1);
 
-namespace rabbit\process;
+namespace Rabbit\Process;
 
 /**
  * Interface ProcessInterface
- * @package rabbit\process
+ * @package Rabbit\Process
  */
 interface ProcessInterface
 {

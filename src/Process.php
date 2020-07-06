@@ -1,19 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2018/10/25
- * Time: 9:26
- */
+declare(strict_types=1);
 
-namespace rabbit\process;
+namespace Rabbit\Process;
 
-use rabbit\core\ObjectFactory;
 use Swoole\Process as SwooleProcess;
 
 /**
  * Class Process
- * @package rabbit\process
+ * @package Rabbit\Process
  */
 class Process
 {
@@ -93,7 +87,7 @@ class Process
     public function name(string $name): void
     {
         $this->name = $name;
-        $this->process->name(ObjectFactory::get('appName', false, 'rabbit') . ': ' . $name);
+        $this->process->name(getDI('appName', false, 'rabbit') . ': ' . $name);
     }
 
     /**

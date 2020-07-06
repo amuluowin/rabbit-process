@@ -1,17 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2018/10/25
- * Time: 14:31
- */
+declare(strict_types=1);
 
-namespace rabbit\process;
+namespace Rabbit\Process;
 
-
-use rabbit\App;
-use rabbit\core\ObjectFactory;
-use rabbit\server\BootInterface;
+use Rabbit\Server\BootInterface;
+use Rabbit\Server\ServerHelper;
 
 /**
  * Class BootProcess
@@ -25,8 +18,8 @@ class BootProcess implements BootInterface
     public function handle(): void
     {
         /** @var ProcessManager $processManager */
-        $processManager = ObjectFactory::get('process');
-        $processManager->autoStart(App::getServer()->getSwooleServer());
+        $processManager = getDI('process');
+        $processManager->autoStart(ServerHelper::getServer()->getSwooleServer());
     }
 
 }

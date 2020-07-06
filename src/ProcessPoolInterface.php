@@ -1,12 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2018/10/25
- * Time: 19:27
- */
+declare(strict_types=1);
 
-namespace rabbit\process;
+namespace Rabbit\Process;
 
 /**
  * Interface ProcessPoolInterface
@@ -18,9 +13,24 @@ interface ProcessPoolInterface
     const SWOOLE_IPC_SOCKET = SWOOLE_IPC_SOCKET;
     const SWOOLE_IPC_DEFAULT = 0;
 
+    /**
+     * @param \Swoole\Process\Pool $pool
+     * @param int $workerId
+     * @return mixed
+     */
     public function run(\Swoole\Process\Pool $pool, int $workerId);
 
+    /**
+     * @param \Swoole\Process\Pool $pool
+     * @param int $workerId
+     * @return mixed
+     */
     public function stop(\Swoole\Process\Pool $pool, int $workerId);
 
+    /**
+     * @param \Swoole\Process\Pool $pool
+     * @param string $data
+     * @return mixed
+     */
     public function message(\Swoole\Process\Pool $pool, string $data);
 }

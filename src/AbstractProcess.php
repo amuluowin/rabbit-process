@@ -1,50 +1,46 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2018/10/25
- * Time: 10:38
- */
+declare(strict_types=1);
 
-namespace rabbit\process;
+namespace Rabbit\Process;
 
-use rabbit\contract\Arrayable;
-use rabbit\server\WorkerHandlerInterface;
+
+use Rabbit\Base\Contract\ArrayAble;
+use Rabbit\Server\WorkerHandlerInterface;
 
 /**
  * Class AbstractProcess
- * @package rabbit\process
+ * @package Rabbit\Process
  */
-abstract class AbstractProcess implements ProcessInterface, Arrayable
+abstract class AbstractProcess implements ProcessInterface, ArrayAble
 {
     /**
      * @var bool
      */
-    protected $boot = false;
+    protected bool $boot = false;
     /**
      * @var bool
      */
-    protected $co = true;
+    protected bool $co = true;
     /**
      * @var bool
      */
-    protected $inout = false;
+    protected bool $inout = false;
     /**
      * @var int
      */
-    protected $pipe = 0;
+    protected int $pipe = 0;
     /** @var int */
-    protected $poolSize = 0;
+    protected int $poolSize = 0;
 
     /**
-     * @var int
+     * @var string
      */
-    protected $status = self::STATUS_STOP;
+    protected string $status = self::STATUS_STOP;
 
     /**
      * @var array | WorkerHandlerInterface[]
      */
-    private $handlers = [];
+    private array $handlers = [];
 
     /**
      * AbstractProcess constructor.

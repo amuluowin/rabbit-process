@@ -1,17 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2018/10/25
- * Time: 10:07
- */
+declare(strict_types=1);
 
-namespace rabbit\process;
+namespace Rabbit\Process;
 
-use rabbit\App;
-use rabbit\core\Exception;
-use rabbit\helper\ExceptionHelper;
-use rabbit\helper\JsonHelper;
+use Rabbit\Base\App;
+use Rabbit\Base\Helper\ExceptionHelper;
 use Swoole\Process as SwooleProcess;
 
 /**
@@ -23,16 +16,16 @@ class ProcessManager
     /**
      * @var array
      */
-    private $processes = [];
+    private array $processes = [];
     /**
      * @var array
      */
-    private $processPool = [];
+    private array $processPool = [];
 
     /**
      * @var array
      */
-    private $definition = [];
+    private array $definition = [];
 
     /**
      * @param bool $definition
@@ -129,9 +122,6 @@ class ProcessManager
      */
     private function beforeProcess(string $processName, AbstractProcess $processObj, Process $process): void
     {
-//        if ($processObj->getBoot()) {
-//            ObjectFactory::reload();
-//        }
         $process->name($processName);
         $this->waitChildProcess($processName, $processObj);
     }
