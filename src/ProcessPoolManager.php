@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Administrator
@@ -8,7 +9,7 @@
 
 namespace Rabbit\Process;
 
-use rabbit\core\Exception;
+use Rabbit\Base\Core\Exception;
 
 /**
  * Class ProcessPool
